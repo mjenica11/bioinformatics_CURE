@@ -12,7 +12,8 @@ graph LR
   E[quantification] --> K[index]
   K[index] --> banana[XY_reference]
   K[index] --> apple[XX_reference]
-  E[quantification] --> L[samples]
+  E[quantification] --> L[female_samples]
+  E[quantification] --> M[male_samples]
   I[raw] --> d[sample]
   C[data] --> adapter_sequences.fa
   C[data] --> h{{samples.config}}
