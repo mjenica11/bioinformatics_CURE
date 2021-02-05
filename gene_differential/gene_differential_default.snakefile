@@ -84,15 +84,25 @@ rule multiQC_trimmed:
 	shell:
 		"multiqc {input.fq1} {input.fq2} -o {output.mqc}"
 
-# Perform quantification of trimmed reads using salmon
-rule quantification:
+# Make index to use for quantification with a pseudo-aligner
+rule make_index:
 	input:
 		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
 		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
 	output:
+		index = "quantification/index"
+	shell:
+		<commands to make index>
+
+# Perform quantification of trimmed reads using salmon
+rule quantification:
+	input:
+		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
+		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz",
+	output:
 		counts = "quantification/samples/{sample}.quant.sf"
 	params:
-		index = "data/salmon_hg38_transcriptome_index" #whatever the file type is...
+		index = "quantification/index"
 		libtype = A # Automatically detect the library type
 	shell:
 		"salmon quant -i {params.index} -l {params.libtype} -1 {input.fq1} {input.fq2} "
