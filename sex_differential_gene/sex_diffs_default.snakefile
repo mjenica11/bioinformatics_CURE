@@ -94,7 +94,7 @@ rule quantification:
 	output:
 		counts = "quantification/samples/{sample}.quant.sf"
 	params:
-		index = "data/salmon_hg38_transcriptome_index. #whatever the file type is...
+		index = "data/salmon_hg38_transcriptome_index" #whatever the file type is...
 		libtype = A # Automatically detect the library type
 	shell:
 		"salmon quant -i {params.index} -l {params.libtype} -1 {input.fq1} {input.fq2} "
@@ -106,8 +106,8 @@ rule prepare_count_matrix:
 		metadata = "data/metadata.csv",
 		counts = "quantification/samples/{sample}.quant.sf"
 	output:
-		female_counts = "quantification/matrices/female_counts.csv",
-		male_counts = "quantification/matrices/male_counts.csv"
+		female_counts = "quantification/female_counts.csv",
+		male_counts = "quantification/male_counts.csv"
 	script:
 		"scripts/combine_counts.R"
 
@@ -115,19 +115,38 @@ rule prepare_count_matrix:
 rule differential_expression:
 	input:
 		metadata = "data/metadata.csv",
-		female_counts = "quantification/matrices/female_counts.csv",
-		male_counts = "quantification/matrices/male_counts.csv"
+		female_counts = "quantification/female_counts.csv",
+		male_counts = "quantification/male_counts.csv"
 	output:
-		results = "differential_expression/results/default.csv"
+		results = "differential_expression/default.csv"
 	script:
 		"scripts/differential_expression.R"
 
-# Generate volcano and mean-difference plots of differential expression results
-rule plot_results:
+# Generate volcano plot of differential expression results
+rule volcano_plot:
 	input:
-		results = "differential_expression/results/default/default.csv"
+		results = "differential_expression/default.csv"
 	output:
-		volcano = "differential_expression/results/default/volcano.pdf",
-		md = "differential_expression/results/default/mean_difference.pdf"
+		volcano = "differential_expression/default/volcano.pdf",
+		md = "differential_expression/default/mean_difference.pdf"
 	script:
-		"scripts/plots_differential_expression.R"
+		"scripts/volcano_plot.R"
+
+# Generate mean-difference plot of differential expression results
+rule mean_difference_plot:
+	input:
+		results = "differential_expression/default.csv"
+	output:
+		mean_difference = "differential_expression/mean_difference.pdf",
+		md = "differential_expression/mean_difference.pdf"
+	script:
+		"scripts/mean_difference_plot.R"
+
+# Generate venn plot of differential expression results
+rule venn_diagram:
+	input:
+		results = "differential_expression/default.csv"
+	output:
+		venn = "differential_expression/venn_diagram.pdf",
+	script:
+		"scripts/venn_diagram.R"
