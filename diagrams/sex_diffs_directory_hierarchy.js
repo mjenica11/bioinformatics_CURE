@@ -24,6 +24,7 @@ graph LR
   B[scripts] --> U{{differential_expression.R}}
   B[scripts] --> V{{volcano_plot.R}}
   B[scripts] --> b{{md_plot.R}}
+  B[scripts] --> k{{venn_diagram.R}}
   G[raw] --> W{{raw fastas}}
   H[trimmed] --> X{{trimmed fastas}}
   c[sample] --> Z{{individual html reports}}
