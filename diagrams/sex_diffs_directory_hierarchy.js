@@ -17,7 +17,8 @@ graph LR
   I[raw] --> d[sample]
   C[data] --> adapter_sequences.fa
   C[data] --> h{{samples.config}}
-  L[samples] --> Q{{sample quant.sf files}}
+  L[female_samples] --> Q{{sample quant.sf files}}
+  M[male_samples] --> dragonfruit{{sample quant.sf files}}
   E[quantification] --> R{{female_count_matrix.csv}}
   E[quantification] --> AB{{male_count_matrix.csv}}
   F[differential_expression] --> N{{results.csv}}
@@ -28,6 +29,7 @@ graph LR
   B[scripts] --> U{{differential_expression.R}}
   B[scripts] --> V{{volcano_plot.R}}
   B[scripts] --> b{{md_plot.R}}
+  B[scripts] --> orange{{venn_diagram.R}}
   G[raw] --> W{{raw fastas}}
   H[trimmed] --> X{{trimmed fastas}}
   c[sample] --> Z{{individual html reports}}
