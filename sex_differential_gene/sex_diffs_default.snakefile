@@ -86,25 +86,61 @@ rule multiQC_trimmed:
 	shell:
 		"multiqc {input.fq1} {input.fq2} -o {output.mqc}"
 
-# Perform quantification of trimmed reads using salmon
+# Make XX index for quantification using a pseudo-aligner
+rule XX_index:
+	input:
+		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
+		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
+	output:
+		XX_index = "quantification/index/XX_index"
+	params:
+	shell:
+		<make_XX_index>
+	
+# Make XY index for quantification using a pseudo-aligner
+rule XY_index:
+	input:
+		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
+		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
+	output:
+		XY_index = "quantification/index/XY_index"
+	params:
+	shell:
+		<make_XY_index>
+
+# Perform quantification of trimmed reads using XX index
 rule quantification:
 	input:
 		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
 		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
 	output:
-		counts = "quantification/samples/{sample}.quant.sf"
+		counts = "quantification/female_samples/{sample}.quant.sf"
 	params:
-		index = "data/salmon_hg38_transcriptome_index" #whatever the file type is...
+		index = "quantification/index/XX_index" 
+		libtype = A # Automatically detect the library type
+	shell: # example code if I were to use salmon
+		"salmon quant -i {params.index} -l {params.libtype} -1 {input.fq1} {input.fq2} "
+		"-o {output.counts}"
+
+# Perform quantification of trimmed reads using XY index
+rule quantification:
+	input:
+		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
+		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
+	output:
+		counts = "quantification/male_samples/{sample}.quant.sf"
+	params:
+		index = "quantification/index/XY_index" 
 		libtype = A # Automatically detect the library type
 	shell:
 		"salmon quant -i {params.index} -l {params.libtype} -1 {input.fq1} {input.fq2} "
-		"-o {output.counts}"
 
 # Combine sample counts into one matrix for each sex 
 rule prepare_count_matrix:
 	input:
 		metadata = "data/metadata.csv",
-		counts = "quantification/samples/{sample}.quant.sf"
+		female_counts = "quantification/female_samples/{sample}.quant.sf"
+		male_counts = "quantification/male_samples/{sample}.quant.sf"
 	output:
 		female_counts = "quantification/female_counts.csv",
 		male_counts = "quantification/male_counts.csv"
