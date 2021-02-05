@@ -3,6 +3,13 @@
 # Dictionary of samples
 configfile: <enter_path_here>
 
+# Split samples by sex
+XX_samples = config["XX_samples"]
+XY_samples = config["XY_samples"]
+
+# Set of all samples
+sample = XX_samples + XY_samples 
+
 # Process to be executed
 rule all:
 	input:
@@ -87,8 +94,8 @@ rule multiQC_trimmed:
 # Make XX index for quantification using a pseudo-aligner
 rule XX_index:
 	input:
-		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
-		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
+		fq1  = "trimmed_reads/{XX_samples}_paired_1.fastq.gz",
+		fq2  = "trimmed_reads/{XX_samples}_paired_2.fastq.gz"
 	output:
 		XX_index = "quantification/index/XX_index"
 	params:
@@ -98,8 +105,8 @@ rule XX_index:
 # Make XY index for quantification using a pseudo-aligner
 rule XY_index:
 	input:
-		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
-		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
+		fq1  = "trimmed_reads/{XY_samples}_paired_1.fastq.gz",
+		fq2  = "trimmed_reads/{XY_samples}_paired_2.fastq.gz"
 	output:
 		XY_index = "quantification/index/XY_index"
 	params:
@@ -109,10 +116,10 @@ rule XY_index:
 # Perform quantification of trimmed reads using XX index
 rule XX_quantification:
 	input:
-		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
-		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
+		fq1  = "trimmed_reads/{XX_samples}_paired_1.fastq.gz",
+		fq2  = "trimmed_reads/{XX_samples}_paired_2.fastq.gz"
 	output:
-		counts = "quantification/female_samples/{sample}.quant.sf"
+		counts = "quantification/female_samples/{XX_samples}.quant.sf"
 	params:
 		index = "quantification/index/XX_index" 
 		libtype = A # Automatically detect the library type
@@ -123,10 +130,10 @@ rule XX_quantification:
 # Perform quantification of trimmed reads using XY index
 rule XY_quantification:
 	input:
-		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
-		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
+		fq1  = "trimmed_reads/{XY_samples}_paired_1.fastq.gz",
+		fq2  = "trimmed_reads/{XY_samples}_paired_2.fastq.gz"
 	output:
-		counts = "quantification/male_samples/{sample}.quant.sf"
+		counts = "quantification/male_samples/{XY_samples}.quant.sf"
 	params:
 		index = "quantification/index/XY_index" 
 		libtype = A # Automatically detect the library type
@@ -137,8 +144,8 @@ rule XY_quantification:
 rule prepare_count_matrix:
 	input:
 		metadata = "data/metadata.csv",
-		female_counts = "quantification/female_samples/{sample}.quant.sf"
-		male_counts = "quantification/male_samples/{sample}.quant.sf"
+		female_counts = "quantification/female_samples/{XX_samples}.quant.sf"
+		male_counts = "quantification/male_samples/{XY_samples}.quant.sf"
 	output:
 		female_counts = "quantification/female_counts.csv",
 		male_counts = "quantification/male_counts.csv"
