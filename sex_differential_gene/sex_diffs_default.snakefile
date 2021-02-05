@@ -1,6 +1,4 @@
-# TO-DO:
-# 1) Add sex chromosome complement refence to quantification step
-# 2) Complete differential expression steps
+# Purpose: Example sex-aware differential gene expression pipeline
 
 # Dictionary of samples
 configfile: <enter_path_here>
@@ -109,7 +107,7 @@ rule XY_index:
 		<make_XY_index>
 
 # Perform quantification of trimmed reads using XX index
-rule quantification:
+rule XX_quantification:
 	input:
 		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
 		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
@@ -123,7 +121,7 @@ rule quantification:
 		"-o {output.counts}"
 
 # Perform quantification of trimmed reads using XY index
-rule quantification:
+rule XY_quantification:
 	input:
 		fq1  = "trimmed_reads/{sample}_paired_1.fastq.gz",
 		fq2  = "trimmed_reads/{sample}_paired_2.fastq.gz"
